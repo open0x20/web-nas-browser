@@ -1,6 +1,9 @@
 <?php
 $version = "V1.3.5";
 
+# Added so it can be called from anywhere
+header('Access-Control-Allow-Origin: *');
+
 // ...
 $longest_name = 4; // Defaults to 4 because of header "NAME"
 $longest_ext = 3; // Defaults to 3 because of header "EXT"
