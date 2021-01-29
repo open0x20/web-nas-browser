@@ -27,9 +27,13 @@ if (substr(realpath($working_dir), 0, strlen($lowest_allowed_directory)) !== $lo
     $working_dir = './';
 }
 
-function getHumanReadableFileSize($filepath)
+function getFileSize($filepath, $humanReadable = false)
 {
-    return trim(exec('stat -c %s ' . $filepath . '  | numfmt --to=iec'));
+    if ($humanReadable) {
+        return trim(exec('stat -c %s ' . $filepath . '  | numfmt --to=iec'));
+    } else {
+        return trim(exec('stat -c %s ' . $filepath));
+    }
 }
 
 // Initial directory scan
@@ -41,7 +45,7 @@ foreach (new DirectoryIterator($working_dir) as $nodeInfo) {
     $node = [
             'name' => $nodeInfo->getBasename(),
             'ext' => $nodeInfo->getExtension(),
-            'size' => getHumanReadableFileSize($nodeInfo->getPathName()),
+            'size' => getFileSize($nodeInfo->getPathName(), true),
             'time' => $nodeInfo->getMTime(),
             'link' => $working_dir . $nodeInfo->getBasename()
     ];
@@ -95,13 +99,13 @@ foreach (new DirectoryIterator($working_dir) as $nodeInfo) {
         $longest_ext = strlen($nodeInfo->getExtension());
     }
     if (strlen($nodeInfo->getSize()) > $longest_size) {
-        $longest_size = strlen(getHumanReadableFileSize($nodeInfo->getPathName()));
+        $longest_size = strlen(getFileSize($nodeInfo->getPathName(), true));
     }
 
     // Sum up file count and sizes
     if (!$nodeInfo->isDot()) {
         $sum_files++;
-        $sum_sizes += $nodeInfo->getSize();
+        $sum_sizes += getFileSize($nodeInfo->getPathName());
     }
 
     if ($nodeInfo->isDir()) {
